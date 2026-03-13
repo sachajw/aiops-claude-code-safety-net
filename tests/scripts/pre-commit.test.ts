@@ -48,6 +48,7 @@ function createTestRepo(): { readonly repoDir: string; readonly env: Record<stri
   runChecked(['git', 'init', '-q'], repoDir);
   runChecked(['git', 'config', 'user.email', 'test@example.com'], repoDir);
   runChecked(['git', 'config', 'user.name', 'Safety Net Test'], repoDir);
+  runChecked(['git', 'config', 'core.autocrlf', 'false'], repoDir);
   runChecked(['git', 'config', 'commit.gpgsign', 'false'], repoDir);
 
   const stubBinDir = join(repoDir, '.test-bin');
@@ -84,6 +85,16 @@ afterEach(() => {
 });
 
 describe('pre-commit dist staging', () => {
+  test('temp repo disables git line-ending conversion', () => {
+    const { repoDir, env } = createTestRepo();
+
+    const result = runCommand(['git', 'config', '--local', '--get', 'core.autocrlf'], repoDir, env);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('false');
+    expect(result.stderr).toBe('');
+  });
+
   test('stages newly generated untracked files in dist', () => {
     const { repoDir, env } = createTestRepo();
 
