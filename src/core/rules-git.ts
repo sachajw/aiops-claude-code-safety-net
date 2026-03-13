@@ -42,6 +42,7 @@ const CHECKOUT_OPTS_WITH_VALUE = new Set([
   '-B',
   '--orphan',
   '--conflict',
+  '--inter-hunk-context',
   '--pathspec-from-file',
   '--unified',
 ]);
@@ -51,22 +52,37 @@ const CHECKOUT_OPTS_WITH_OPTIONAL_VALUE = new Set(['--recurse-submodules', '--tr
 const CHECKOUT_KNOWN_OPTS_NO_VALUE = new Set([
   '-q',
   '--quiet',
+  '--no-quiet',
   '-f',
   '--force',
+  '--no-force',
   '-d',
   '--detach',
+  '--no-detach',
   '-m',
   '--merge',
+  '--no-merge',
   '-p',
   '--patch',
+  '--no-patch',
+  '--guess',
+  '--no-guess',
+  '--overlay',
+  '--no-overlay',
   '--ours',
   '--theirs',
+  '--ignore-skip-worktree-bits',
+  '--no-ignore-skip-worktree-bits',
   '--no-track',
   '--overwrite-ignore',
   '--no-overwrite-ignore',
   '--ignore-other-worktrees',
+  '--no-ignore-other-worktrees',
   '--progress',
   '--no-progress',
+  '--pathspec-file-nul',
+  '--no-pathspec-file-nul',
+  '--no-recurse-submodules',
 ]);
 
 function splitAtDoubleDash(tokens: readonly string[]): {
@@ -232,12 +248,9 @@ function getCheckoutPositionalArgs(tokens: readonly string[]): string[] {
         !CHECKOUT_OPTS_WITH_VALUE.has(token) &&
         !CHECKOUT_OPTS_WITH_OPTIONAL_VALUE.has(token)
       ) {
-        const nextToken = tokens[i + 1];
-        if (nextToken && !nextToken.startsWith('-')) {
-          i += 2;
-        } else {
-          i++;
-        }
+        // Fail safe: unknown checkout long options must not hide the next token
+        // from ambiguous ref/path detection.
+        i++;
       } else {
         i++;
       }
