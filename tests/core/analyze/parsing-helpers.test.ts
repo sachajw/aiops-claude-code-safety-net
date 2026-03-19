@@ -148,6 +148,25 @@ describe('shell parsing helpers', () => {
         ['rm', '-rf', '/tmp/x'],
       ]);
     });
+
+    test('drops plain redirect targets but keeps ambiguous numeric args', () => {
+      expect(splitShellCommands('rm -rf ./foo 2>/dev/null')).toEqual([['rm', '-rf', './foo', '2']]);
+      expect(splitShellCommands('rm -rf 7 > /dev/null')).toEqual([['rm', '-rf', '7']]);
+    });
+
+    test('keeps nested command substitutions in redirect targets analyzable', () => {
+      expect(splitShellCommands('echo x >$(git reset --hard)')).toEqual([
+        ['echo', 'x'],
+        ['git', 'reset', '--hard'],
+      ]);
+    });
+
+    test('drops redirect targets inside nested command substitutions', () => {
+      expect(splitShellCommands('echo $(rm -rf /tmp/foo 2>/dev/null)')).toEqual([
+        ['echo'],
+        ['rm', '-rf', '/tmp/foo', '2'],
+      ]);
+    });
   });
 
   describe('stripWrappersWithInfo', () => {

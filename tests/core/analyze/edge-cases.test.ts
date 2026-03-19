@@ -202,6 +202,14 @@ describe('edge cases', () => {
     test('command substitution find without delete allowed', () => {
       assertAllowed('echo $(find . -name foo )');
     });
+
+    test('command substitution in redirect target git reset hard blocked', () => {
+      assertBlocked('echo x >$(git reset --hard)', 'git reset --hard');
+    });
+
+    test('command substitution in redirect target rm root blocked', () => {
+      assertBlocked('echo x >$(rm -rf /)', 'extremely dangerous');
+    });
   });
 
   describe('xargs', () => {

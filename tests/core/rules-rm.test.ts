@@ -135,6 +135,14 @@ describe('rm -rf allowed', () => {
   test('busybox rm -rf /tmp/test-dir allowed', () => {
     assertAllowed('busybox rm -rf /tmp/test-dir');
   });
+
+  test('rm -rf /tmp/foo 2>/dev/null allowed', () => {
+    assertAllowed('rm -rf /tmp/foo 2>/dev/null', '/tmp');
+  });
+
+  test('echo $(rm -rf /tmp/foo 2>/dev/null) allowed', () => {
+    assertAllowed('echo $(rm -rf /tmp/foo 2>/dev/null)', '/tmp');
+  });
 });
 
 describe('rm -rf cwd-aware', () => {
@@ -215,6 +223,15 @@ describe('rm -rf cwd-aware', () => {
     try {
       const inside = join(tmpDir, 'dist');
       assertAllowed(`rm -rf ${toShellPath(inside)}`, tmpDir);
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('rm -rf ./subdir 2>/dev/null allowed', () => {
+    setup();
+    try {
+      assertAllowed('rm -rf ./subdir 2>/dev/null', tmpDir);
     } finally {
       cleanup();
     }
@@ -393,6 +410,10 @@ describe('rm -rf cwd-aware', () => {
     } finally {
       cleanup();
     }
+  });
+
+  test('rm -rf numeric target before redirect stays blocked conservatively', () => {
+    assertBlocked('rm -rf 7 > /dev/null', 'rm -rf');
   });
 });
 

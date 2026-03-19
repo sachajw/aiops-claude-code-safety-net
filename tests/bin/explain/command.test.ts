@@ -158,6 +158,37 @@ describe('explainCommand edge cases', () => {
     const result = explainCommand('git status', { cwd: '/tmp' });
     expect(result.result).toBe('allowed');
   });
+
+  test('rm redirect to dev null is allowed when target is safe', () => {
+    const result = explainCommand('rm -rf /tmp/foo 2>/dev/null');
+    expect(result.result).toBe('allowed');
+    expect(result.trace.steps).toContainEqual({
+      type: 'parse',
+      input: 'rm -rf /tmp/foo 2>/dev/null',
+      segments: [['rm', '-rf', '/tmp/foo', '2']],
+    });
+  });
+
+  test('redirect target command substitution remains blocked', () => {
+    const result = explainCommand('echo x >$(git reset --hard)');
+    expect(result.result).toBe('blocked');
+    expect(result.reason).toContain('git reset --hard');
+  });
+
+  test('nested rm redirect to dev null is allowed in command substitution', () => {
+    const result = explainCommand('echo $(rm -rf /tmp/foo 2>/dev/null)');
+    expect(result.result).toBe('allowed');
+  });
+
+  test('numeric rm target before redirect is preserved in explain trace', () => {
+    const result = explainCommand('rm -rf 7 > /dev/null');
+    expect(result.result).toBe('allowed');
+    expect(result.trace.steps).toContainEqual({
+      type: 'parse',
+      input: 'rm -rf 7 > /dev/null',
+      segments: [['rm', '-rf', '7']],
+    });
+  });
 });
 
 describe('explainCommand rm with home directory', () => {
