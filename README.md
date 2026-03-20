@@ -220,7 +220,7 @@ Safety Net supports GitHub Copilot CLI via its [hooks system](https://docs.githu
 >   - repository: `.github/copilot/settings.json`
 >   - local override: `.github/copilot/settings.local.json`
 >
-> Copilot settings cascade from user -> repository -> local. `disableAllHooks: true` disables both repo-level and user-level hooks. If you use `COPILOT_HOME`, replace `~/.copilot` with that directory.
+> Copilot settings cascade from user -> repository -> local (later files override earlier ones, so local overrides repository overrides user). `disableAllHooks: true` disables both repo-level and user-level hooks. If you use `COPILOT_HOME`, replace `~/.copilot` with that directory.
 
 #### Option A: Hook Files
 
