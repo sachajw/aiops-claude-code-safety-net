@@ -4080,9 +4080,12 @@ function _checkCopilotEnabled(homeDir, cwd, copilotCliVersion, errors) {
     repoSettings: _collectCopilotInlineConfig(join3(repoConfigDir, "settings.json"), inlineErrors),
     localSettings: _collectCopilotInlineConfig(join3(repoConfigDir, "settings.local.json"), inlineErrors)
   };
-  if (inlineSupport === true) {
+  if (inlineSupport !== false) {
     const disableSource = _resolveCopilotInlineDisableSource(inlineSources);
     if (disableSource) {
+      if (inlineSupport === null) {
+        errors.push(`Copilot CLI version unavailable; treating disableAllHooks in ${disableSource} as active`);
+      }
       return { activeConfigPaths: [], disabledBy: disableSource };
     }
   }

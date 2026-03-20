@@ -593,9 +593,14 @@ function _checkCopilotEnabled(
     ),
   };
 
-  if (inlineSupport === true) {
+  if (inlineSupport !== false) {
     const disableSource = _resolveCopilotInlineDisableSource(inlineSources);
     if (disableSource) {
+      if (inlineSupport === null) {
+        errors.push(
+          `Copilot CLI version unavailable; treating disableAllHooks in ${disableSource} as active`,
+        );
+      }
       return { activeConfigPaths: [], disabledBy: disableSource };
     }
   }

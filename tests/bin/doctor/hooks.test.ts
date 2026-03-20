@@ -826,6 +826,31 @@ describe('detectAllHooks', () => {
     }
   });
 
+  test('Copilot CLI: unknown version still honors inline disableAllHooks over repo hook files', () => {
+    const tmpBase = join(tmpdir(), `doctor-copilot-${Date.now()}`);
+    const homeDir = join(tmpBase, 'home');
+    const projectDir = join(tmpBase, 'project');
+    const hooksDir = join(projectDir, '.github', 'hooks');
+    const configDir = join(projectDir, '.github', 'copilot');
+    mkdirSync(hooksDir, { recursive: true });
+    mkdirSync(configDir, { recursive: true });
+    _writeCopilotHook(join(hooksDir, 'safety-net.json'));
+    writeFileSync(join(configDir, 'settings.json'), JSON.stringify({ disableAllHooks: true }));
+
+    try {
+      const hooks = detectAllHooks(projectDir, { homeDir });
+      const copilot = hooks.find((hook) => hook.platform === 'copilot-cli');
+
+      expect(copilot?.status).toBe('disabled');
+      expect(copilot?.configPath).toBe(join(configDir, 'settings.json'));
+      expect(copilot?.configPaths).toEqual([join(configDir, 'settings.json')]);
+      expect(copilot?.errors?.some((e) => e.includes('version unavailable'))).toBe(true);
+      expect(copilot?.selfTest).toBeUndefined();
+    } finally {
+      rmSync(tmpBase, { recursive: true, force: true });
+    }
+  });
+
   test('Copilot CLI: repository settings can override user disableAllHooks', () => {
     const tmpBase = join(tmpdir(), `doctor-copilot-${Date.now()}`);
     const homeDir = join(tmpBase, 'home');
