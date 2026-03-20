@@ -66,6 +66,7 @@ export function withEnv<T>(env: Record<string, string>, fn: () => T): T {
 /**
  * Mock version fetcher for testing.
  * Returns predefined versions instantly without spawning processes.
+ * @internal Exported for testing
  */
 export const mockVersionFetcher: VersionFetcher = async (args: string[]) => {
   const cmd = args[0];
