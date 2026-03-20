@@ -33,6 +33,7 @@ export interface HookStatus {
     status: HookConfigStatus;
     method?: string;
     configPath?: string;
+    configPaths?: string[];
     errors?: string[];
     selfTest?: SelfTestSummary;
 }
@@ -96,7 +97,7 @@ export interface SystemInfo {
     openCodeVersion: string | null;
     /** Gemini CLI version (from `gemini --version`) */
     geminiCliVersion: string | null;
-    /** Copilot CLI version (from `copilot --version`) */
+    /** Copilot CLI version (from `copilot --binary-version`, falling back to `copilot --version`) */
     copilotCliVersion: string | null;
     /** Node.js version (from `node --version`) */
     nodeVersion: string | null;
