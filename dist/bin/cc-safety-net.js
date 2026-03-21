@@ -2563,7 +2563,7 @@ var CHECKOUT_OPTS_WITH_VALUE = new Set([
   "--unified"
 ]);
 var CHECKOUT_OPTS_WITH_OPTIONAL_VALUE = new Set(["--recurse-submodules", "--track", "-t"]);
-var CHECKOUT_SHORT_OPTS_WITH_VALUE = new Set(["b", "B", "U"]);
+var CHECKOUT_SHORT_OPTS_WITH_VALUE = new Set(["-b", "-B", "-U"]);
 var SWITCH_SHORT_OPTS_WITH_VALUE = new Set(["-c", "-C"]);
 var CHECKOUT_KNOWN_OPTS_NO_VALUE = new Set([
   "-q",
@@ -2678,7 +2678,10 @@ function extractGitSubcommandAndRest(tokens) {
 }
 function analyzeGitCheckout(tokens) {
   const { index: doubleDashIdx, before: beforeDash } = splitAtDoubleDash(tokens);
-  if (hasCheckoutForceFlag(beforeDash)) {
+  const shortOpts = extractShortOpts(beforeDash, {
+    shortOptsWithValue: CHECKOUT_SHORT_OPTS_WITH_VALUE
+  });
+  if (beforeDash.includes("--force") || shortOpts.has("-f")) {
     return REASON_CHECKOUT_FORCE;
   }
   for (const token of tokens) {
@@ -2704,30 +2707,6 @@ function analyzeGitCheckout(tokens) {
     return REASON_CHECKOUT_AMBIGUOUS;
   }
   return null;
-}
-function hasCheckoutForceFlag(tokens) {
-  for (const token of tokens) {
-    if (token === "--force") {
-      return true;
-    }
-    if (!token.startsWith("-") || token.startsWith("--") || token === "-") {
-      continue;
-    }
-    const chars = token.slice(1);
-    for (let i = 0;i < chars.length; i++) {
-      const char = chars[i];
-      if (!char || !/[a-zA-Z]/.test(char)) {
-        break;
-      }
-      if (CHECKOUT_SHORT_OPTS_WITH_VALUE.has(char)) {
-        break;
-      }
-      if (char === "f") {
-        return true;
-      }
-    }
-  }
-  return false;
 }
 function analyzeGitSwitch(tokens) {
   const { before } = splitAtDoubleDash(tokens);

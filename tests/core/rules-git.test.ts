@@ -57,8 +57,16 @@ describe('git checkout', () => {
     assertAllowed('git checkout -bnew-branch');
   });
 
+  test('git checkout -bfeature allowed', () => {
+    assertAllowed('git checkout -bfeature');
+  });
+
   test('git checkout -Bnew-branch allowed', () => {
     assertAllowed('git checkout -Bnew-branch');
+  });
+
+  test('git checkout -qbfeature allowed', () => {
+    assertAllowed('git checkout -qbfeature');
   });
 
   test('git checkout ref pathspec blocked', () => {
