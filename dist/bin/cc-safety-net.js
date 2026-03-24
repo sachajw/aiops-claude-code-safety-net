@@ -4208,7 +4208,7 @@ function detectAllHooks(cwd, options) {
 
 // src/bin/doctor/system-info.ts
 import { spawn } from "node:child_process";
-var CURRENT_VERSION = "0.8.0";
+var CURRENT_VERSION = "0.8.1";
 var VERSION_FETCH_TIMEOUT_MS = 2000;
 function getPackageVersion() {
   return CURRENT_VERSION;
@@ -5291,7 +5291,7 @@ function formatTraceJson(result) {
   return JSON.stringify(result, null, 2);
 }
 // src/bin/help.ts
-var version = "0.8.0";
+var version = "0.8.1";
 var INDENT = "  ";
 var PROGRAM_NAME = "cc-safety-net";
 function formatOptionFlags(option) {
